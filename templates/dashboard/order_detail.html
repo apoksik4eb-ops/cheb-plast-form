@@ -1,0 +1,88 @@
+{% extends 'dashboard/base.html' %}
+
+{% block dashboard_content %}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Заказ №{{ order.id }}</h1>
+    <span class="inline-block px-3 py-1 text-sm rounded-full
+        {% if order.status == 'done' %}bg-green-100 text-green-700
+        {% elif order.status == 'canceled' %}bg-red-100 text-red-700
+        {% elif order.status == 'new' %}bg-blue-100 text-blue-700
+        {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+        {{ order.get_status_display }}
+    </span>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        <div>
+            <dt class="text-gray-500">Дата</dt>
+            <dd class="font-medium">{{ order.created_at|date:"d.m.Y H:i" }}</dd>
+        </div>
+        <div>
+            <dt class="text-gray-500">Сумма</dt>
+            <dd class="font-medium text-lg text-brand-700">{{ order.total }} ₽</dd>
+        </div>
+        <div>
+            <dt class="text-gray-500">Оплата</dt>
+            <dd class="font-medium">{{ order.get_payment_display }}</dd>
+        </div>
+        {% if order.company_name %}
+            <div>
+                <dt class="text-gray-500">Компания</dt>
+                <dd class="font-medium">{{ order.company_name }} (ИНН {{ order.company_inn }})</dd>
+            </div>
+        {% endif %}
+    </dl>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+            <tr>
+                <th class="px-4 py-3 text-left font-medium">Товар</th>
+                <th class="px-4 py-3 text-left font-medium">Цена</th>
+                <th class="px-4 py-3 text-left font-medium">Кол-во</th>
+                <th class="px-4 py-3 text-left font-medium">Сумма</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for item in order.items.all %}
+            <tr>
+                <td class="px-4 py-3 font-medium">{{ item.product_name }}</td>
+                <td class="px-4 py-3 text-gray-600">{{ item.price }} ₽</td>
+                <td class="px-4 py-3">{{ item.quantity }}</td>
+                <td class="px-4 py-3 font-medium">{{ item.subtotal }} ₽</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if order.comment %}
+    <div class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6 text-sm">
+        <strong>Комментарий:</strong> {{ order.comment }}
+    </div>
+{% endif %}
+
+<div class="flex flex-wrap gap-3">
+    {% if order.status in 'new,processing' %}
+        <form method="post" action="{% url 'dashboard:order_cancel' order.pk %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                Отменить заказ
+            </button>
+        </form>
+    {% endif %}
+
+    <form method="post" action="{% url 'dashboard:order_repeat' order.pk %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Повторить заказ
+        </button>
+    </form>
+</div>
+
+{% endblock %}

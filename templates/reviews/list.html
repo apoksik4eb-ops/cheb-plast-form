@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Отзывы — ПолиФорм{% endblock %}
+
+{% block content %}
+
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-3xl font-bold">Отзывы клиентов</h1>
+        {% if stats.count %}
+            <div class="flex items-center gap-2 mt-2 text-gray-600">
+                <span class="text-yellow-500 text-lg">
+                    {% for i in "12345"|make_list %}{% if forloop.counter <= stats.avg %}★{% else %}☆{% endif %}{% endfor %}
+                </span>
+                <span>{{ stats.avg|floatformat:1 }} из 5</span>
+                <span class="text-sm">({{ stats.count }} отзывов)</span>
+            </div>
+        {% endif %}
+    </div>
+    <a href="{% url 'reviews:create' %}"
+       class="px-6 py-3 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 transition">
+        Написать отзыв
+    </a>
+</div>
+
+{% if reviews %}
+    <div class="space-y-4">
+        {% for review in reviews %}
+            <article class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <header class="flex flex-wrap items-center gap-3 mb-3">
+                    <strong class="text-gray-900">{{ review.name }}</strong>
+                    {% if review.company %}
+                        <span class="text-sm text-gray-500">— {{ review.company }}</span>
+                    {% endif %}
+                    {% if review.is_verified %}
+                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">
+                            ✓ Подтверждённый клиент
+                        </span>
+                    {% endif %}
+                    <span class="text-yellow-500">
+                        {% for i in "12345"|make_list %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}
+                    </span>
+                    <time class="text-sm text-gray-500 ml-auto">{{ review.created_at|date:"d.m.Y" }}</time>
+                </header>
+                {% if review.title %}
+                    <h3 class="font-semibold text-gray-900 mb-2">{{ review.title }}</h3>
+                {% endif %}
+                <p class="text-gray-700">{{ review.text|linebreaks }}</p>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-16 bg-white rounded-xl border border-gray-100">
+        <p class="text-gray-500 mb-4">Пока нет отзывов</p>
+        <a href="{% url 'reviews:create' %}"
+           class="inline-block px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition">
+            Стать первым
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

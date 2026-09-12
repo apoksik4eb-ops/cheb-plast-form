@@ -1,0 +1,57 @@
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
+
+    <a href="{{ product.get_absolute_url }}" class="block relative aspect-square bg-gray-100">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+        {% else %}
+            <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+                Нет фото
+            </div>
+        {% endif %}
+
+        {% if product.is_new %}
+            <span class="absolute top-2 left-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded">
+                Новинка
+            </span>
+        {% endif %}
+        {% if product.is_hit %}
+            <span class="absolute top-2 {% if product.is_new %}left-20{% else %}left-2{% endif %} px-2 py-1 bg-red-500 text-white text-xs font-medium rounded">
+                Хит
+            </span>
+        {% endif %}
+    </a>
+
+    <div class="p-4">
+        <div class="text-xs text-gray-500 mb-1">Арт. {{ product.article }}</div>
+        <a href="{{ product.get_absolute_url }}"
+           class="block font-semibold text-gray-900 hover:text-brand-600 transition mb-1 line-clamp-2">
+            {{ product.name }}
+        </a>
+
+        {% if product.short_description %}
+            <div class="text-sm text-gray-500 mb-3 line-clamp-2">{{ product.short_description }}</div>
+        {% endif %}
+
+        <div class="text-xl font-bold text-gray-900 mb-3">
+            {% if product.display_price %}
+                {{ product.display_price }} ₽ <span class="text-sm font-normal text-gray-500">/ {{ product.unit }}</span>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="text-sm text-brand-600 hover:underline">
+                    Войдите для цены
+                </a>
+            {% endif %}
+        </div>
+
+        <form method="post" action="{% url 'orders:cart_add' product.id %}" class="flex gap-2">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <input type="number" name="quantity" value="{{ product.min_order }}" min="{{ product.min_order }}"
+                   class="w-24 px-2 py-2 border border-gray-300 rounded-lg text-center text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <button type="submit"
+                    class="flex-1 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition">
+                В корзину
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+{% extends 'dashboard/base.html' %}
+
+{% block dashboard_content %}
+
+<h1 class="text-2xl font-bold mb-6">Мои заказы</h1>
+
+<form method="get" class="flex gap-3 mb-6">
+    <select name="status"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <option value="">Все статусы</option>
+        <option value="new" {% if request.GET.status == 'new' %}selected{% endif %}>Новые</option>
+        <option value="processing" {% if request.GET.status == 'processing' %}selected{% endif %}>В обработке</option>
+        <option value="done" {% if request.GET.status == 'done' %}selected{% endif %}>Выполненные</option>
+        <option value="canceled" {% if request.GET.status == 'canceled' %}selected{% endif %}>Отменённые</option>
+    </select>
+    <button type="submit" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+        Фильтр
+    </button>
+</form>
+
+{% if orders %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                <tr>
+                    <th class="px-4 py-3 text-left font-medium">№</th>
+                    <th class="px-4 py-3 text-left font-medium">Дата</th>
+                    <th class="px-4 py-3 text-left font-medium">Позиций</th>
+                    <th class="px-4 py-3 text-left font-medium">Сумма</th>
+                    <th class="px-4 py-3 text-left font-medium">Статус</th>
+                    <th class="px-4 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for order in orders %}
+                <tr>
+                    <td class="px-4 py-3 font-medium">{{ order.id }}</td>
+                    <td class="px-4 py-3 text-gray-600">{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                    <td class="px-4 py-3">{{ order.items.count }}</td>
+                    <td class="px-4 py-3 font-medium">{{ order.total }} ₽</td>
+                    <td class="px-4 py-3">
+                        <span class="inline-block px-2 py-1 text-xs rounded-full
+                            {% if order.status == 'done' %}bg-green-100 text-green-700
+                            {% elif order.status == 'canceled' %}bg-red-100 text-red-700
+                            {% elif order.status == 'new' %}bg-blue-100 text-blue-700
+                            {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="{% url 'dashboard:order_detail' order.pk %}" class="text-brand-600 hover:text-brand-700">Подробнее</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include 'includes/pagination.html' with page=page %}
+{% else %}
+    <p class="text-center text-gray-500 py-12 bg-white rounded-xl border border-gray-100">Заказов нет</p>
+{% endif %}
+
+{% endblock %}

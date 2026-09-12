@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Корзина — ПолиФорм{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-8">Корзина</h1>
+
+{% if cart|length %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+        <table class="w-full">
+            <thead class="bg-gray-50 text-sm text-gray-500 uppercase">
+                <tr>
+                    <th class="px-6 py-3 text-left font-medium">Товар</th>
+                    <th class="px-6 py-3 text-left font-medium">Цена</th>
+                    <th class="px-6 py-3 text-left font-medium">Кол-во</th>
+                    <th class="px-6 py-3 text-left font-medium">Сумма</th>
+                    <th class="px-6 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for item in cart %}
+                <tr>
+                    <td class="px-6 py-4">
+                        <a href="{{ item.product.get_absolute_url }}" class="font-medium text-gray-900 hover:text-brand-600">
+                            {{ item.product.name }}
+                        </a>
+                        <div class="text-xs text-gray-500 mt-1">Арт. {{ item.product.article }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-700">{{ item.price }} ₽</td>
+                    <td class="px-6 py-4">
+                        <form method="post" action="{% url 'orders:cart_add' item.product.id %}" class="flex gap-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="update" value="1">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
+                                   class="w-28 px-2 py-1 border border-gray-300 rounded text-center text-sm">
+                            <button type="submit" class="px-2 py-1 text-gray-500 hover:text-brand-600">↻</button>
+                        </form>
+                    </td>
+                    <td class="px-6 py-4 font-bold text-gray-900">{{ item.subtotal }} ₽</td>
+                    <td class="px-6 py-4 text-right">
+                        <form method="post" action="{% url 'orders:cart_remove' item.product.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-sm text-red-500 hover:text-red-700 transition">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <div class="text-2xl">
+            Итого: <strong class="text-brand-700">{{ cart.get_total }} ₽</strong>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'catalog:list' %}"
+               class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Продолжить покупки
+            </a>
+            <a href="{% url 'orders:order_create' %}"
+               class="px-6 py-3 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 transition">
+                Оформить заказ
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="text-center py-16">
+        <p class="text-gray-500 text-lg mb-6">Корзина пуста</p>
+        <a href="{% url 'catalog:list' %}"
+           class="inline-block px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition">
+            Перейти в каталог
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

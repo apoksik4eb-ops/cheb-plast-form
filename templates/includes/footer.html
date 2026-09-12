@@ -1,0 +1,40 @@
+<footer class="bg-gray-900 text-gray-300 mt-16">
+    <div class="container mx-auto px-4 max-w-7xl py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            <div>
+                <h4 class="text-white font-bold text-lg mb-3">ПолиФорм</h4>
+                <p class="text-sm text-gray-400">
+                    Литьё пластмассовых изделий<br>
+                    на термопластавтоматах
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-lg mb-3">Разделы</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{% url 'catalog:list' %}" class="hover:text-white transition">Каталог</a></li>
+                    <li><a href="{% url 'pages:about' %}" class="hover:text-white transition">О компании</a></li>
+                    <li><a href="{% url 'reviews:list' %}" class="hover:text-white transition">Отзывы</a></li>
+                    <li><a href="{% url 'pages:contacts' %}" class="hover:text-white transition">Контакты</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold text-lg mb-3">Контакты</h4>
+                <p class="text-sm text-gray-400">
+                    г. Чебоксары, ул. Промышленная, 1<br>
+                    Тел.: +7 (8352) 00-00-00<br>
+                    Email: info@poliform.ru
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="border-t border-gray-800">
+        <div class="container mx-auto px-4 max-w-7xl py-4 text-sm text-gray-500">
+            © {% now "Y" %} ПолиФорм. Все права защищены.
+        </div>
+    </div>
+</footer>

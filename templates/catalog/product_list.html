@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог продукции — ПолиФорм{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold mb-8">Каталог продукции</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+    <aside class="lg:col-span-1">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 sticky top-24">
+            <h3 class="font-bold text-lg mb-4">Категории</h3>
+            <ul class="space-y-1">
+                <li>
+                    <a href="{% url 'catalog:list' %}"
+                       class="block px-3 py-2 rounded-lg text-sm transition
+                       {% if not current_category %}bg-brand-50 text-brand-700 font-medium{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                        Все товары
+                    </a>
+                </li>
+                {% for cat in categories %}
+                    <li>
+                        <a href="{% url 'catalog:category' cat.slug %}"
+                           class="block px-3 py-2 rounded-lg text-sm transition
+                           {% if current_category == cat.slug %}bg-brand-50 text-brand-700 font-medium{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                            {{ cat.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
+
+    <div class="lg:col-span-3">
+
+        <form method="get" class="flex flex-wrap gap-3 mb-6">
+            <input type="text" name="q" placeholder="Поиск по названию или артикулу"
+                   value="{{ request.GET.q|default:'' }}"
+                   class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <select name="sort"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="">Сортировка</option>
+                <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Цена ↑</option>
+                <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Цена ↓</option>
+                <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Новинки</option>
+            </select>
+            <button type="submit"
+                    class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                Применить
+            </button>
+        </form>
+
+        {% if products %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {% for product in products %}
+                    {% include 'catalog/_product_card.html' with product=product %}
+                {% endfor %}
+            </div>
+
+            {% include 'includes/pagination.html' with page=page %}
+        {% else %}
+            <p class="text-center text-gray-500 py-16">Ничего не найдено</p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

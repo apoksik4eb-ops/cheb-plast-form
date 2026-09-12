@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}ПолиФорм — литьё пластмасс{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Литьё пластмассовых изделий под давлением на термопластавтоматах.{% endblock %}">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-brand-50:  #eff6ff;
+        --color-brand-100: #dbeafe;
+        --color-brand-500: #3b82f6;
+        --color-brand-600: #2563eb;
+        --color-brand-700: #1d4ed8;
+        --color-brand-900: #1e3a8a;
+      }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-gray-50 text-gray-900 antialiased">
+
+{% include 'includes/header.html' %}
+{% include 'includes/messages.html' %}
+
+<main class="flex-1 container mx-auto px-4 py-8 max-w-7xl">
+    {% block content %}{% endblock %}
+</main>
+
+{% include 'includes/footer.html' %}
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
