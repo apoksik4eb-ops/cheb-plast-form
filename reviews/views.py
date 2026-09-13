@@ -23,21 +23,20 @@ def review_create(request):
     """Создание отзыва"""
     if request.method == 'POST':
         form = ReviewForm(request.POST)
+
         if form.is_valid():
             review = form.save(commit=False)
             review.status = 'pending'
 
             if request.user.is_authenticated:
                 review.user = request.user
-                # Проверяем, что пользователь реально заказывал
                 review.is_verified = _user_has_orders(request.user)
 
-            # IP для защиты от спама
             review.ip_address = _get_client_ip(request)
 
-            # Rate limiting: не больше 3 отзывов с одного IP в час
             if _is_spam(review):
                 messages.error(request, "Слишком много отзывов. Попробуйте позже.")
+
                 return render(request, 'reviews/form.html', {'form': form})
 
             review.save()
@@ -47,27 +46,29 @@ def review_create(request):
                 "Спасибо! Ваш отзыв отправлен на модерацию. "
                 "Он появится на сайте после проверки."
             )
+
             return redirect('reviews:success')
+        
     else:
         initial = {}
+
         if request.user.is_authenticated:
             initial = {
                 'name': request.user.get_full_name() or request.user.username,
                 'email': request.user.email,
             }
+
             if request.user.company:
                 initial['company'] = request.user.company.name
+
         form = ReviewForm(initial=initial)
 
     return render(request, 'reviews/form.html', {'form': form})
 
 
 def review_success(request):
-    """Страница после отправки отзыва"""
     return render(request, 'reviews/success.html')
 
-
-# ─── Вспомогательные функции ───
 
 def _get_client_ip(request):
     xff = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -75,7 +76,6 @@ def _get_client_ip(request):
 
 
 def _is_spam(review):
-    """Не больше 3 отзывов с одного IP в час."""
     from django.utils import timezone
     from datetime import timedelta
 
@@ -89,7 +89,6 @@ def _is_spam(review):
 
 
 def _user_has_orders(user):
-    """Проверяет, есть ли у пользователя выполненные заказы."""
     try:
         from orders.models import Order
         return Order.objects.filter(user=user, status='done').exists()
@@ -98,7 +97,6 @@ def _user_has_orders(user):
 
 
 def _notify_moderator(review):
-    """Уведомление модератору о новом отзыве."""
     try:
         send_mail(
             subject=f"Новый отзыв на модерации: {review.name}",
@@ -114,5 +112,6 @@ def _notify_moderator(review):
             recipient_list=[settings.MANAGER_EMAIL],
             fail_silently=True,
         )
+        
     except Exception:
         pass

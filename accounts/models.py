@@ -9,6 +9,7 @@ class Company(models.Model):
         ('active', 'Активна'),
         ('blocked', 'Заблокирована'),
     ]
+
     PRICE_TYPES = [
         ('retail', 'Розничные'),
         ('wholesale', 'Оптовые'),
@@ -32,8 +33,7 @@ class Company(models.Model):
         related_name='managed_companies', verbose_name="Контактное лицо"
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    price_type = models.CharField(max_length=20, choices=PRICE_TYPES, default='retail',
-                                  verbose_name="Тип цен")
+    price_type = models.CharField(max_length=20, choices=PRICE_TYPES, default='retail', verbose_name="Тип цен")
     discount = models.PositiveSmallIntegerField(default=0, verbose_name="Скидка, %")
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -53,10 +53,12 @@ class Company(models.Model):
             base = slugify(self.name)[:50] or 'company'
             slug = base
             i = 1
+
             while Company.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 i += 1
                 slug = f"{base}-{i}"
             self.slug = slug
+            
         super().save(*args, **kwargs)
 
     @property

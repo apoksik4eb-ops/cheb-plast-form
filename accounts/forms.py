@@ -31,12 +31,14 @@ class CompanyRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         base = (
-            'w-full px-4 py-3 bg-gray-100 border-2 border-gray-400 rounded-lg '
-            'text-gray-900 placeholder-gray-500 transition '
-            'hover:border-gray-500 '
+            'w-full px-4 py-3 bg-gray-100 border-2 border-gray-400 rounded-lg'
+            'text-gray-900 placeholder-gray-500 transition'
+            'hover:border-gray-500'
             'focus:outline-none focus:bg-white focus:border-brand-500'
         )
+
         for name, field in self.fields.items():
             if field.widget.__class__.__name__ == 'CheckboxInput':
                 field.widget.attrs['class'] = 'w-4 h-4 text-brand-600 rounded focus:ring-brand-500'
@@ -48,16 +50,21 @@ class CompanyRegistrationForm(UserCreationForm):
 
     def clean_inn(self):
         inn = self.cleaned_data['inn']
+
         if not inn.isdigit() or len(inn) not in (10, 12):
             raise forms.ValidationError("ИНН: 10 или 12 цифр")
+        
         if Company.objects.filter(inn=inn).exists():
             raise forms.ValidationError("Компания с таким ИНН уже зарегистрирована")
+        
         return inn
 
     def clean_email(self):
         email = self.cleaned_data['email']
+
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email уже используется")
+        
         return email
 
 
@@ -69,9 +76,10 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         base = (
-            'w-full px-4 py-3 bg-gray-100 border-2 border-gray-400 rounded-lg '
+            'w-full px-4 py-3 bg-gray-100 border-2 border-gray-400 rounded-lg'
             'text-gray-900 focus:outline-none focus:bg-white focus:border-brand-500'
         )
+
         for field in self.fields.values():
             field.widget.attrs['class'] = base
 
@@ -79,16 +87,19 @@ class ProfileForm(forms.ModelForm):
 class StyledLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         base = (
-            'w-full px-4 py-3 bg-gray-100 border-2 border-gray-400 rounded-lg '
-            'text-gray-900 placeholder-gray-500 transition '
-            'hover:border-gray-500 '
+            'w-full px-4 py-3 bg-gray-100 border-2 border-gray-400 rounded-lg'
+            'text-gray-900 placeholder-gray-500 transition'
+            'hover:border-gray-500'
             'focus:outline-none focus:bg-white focus:border-brand-500'
         )
+
         self.fields['username'].widget.attrs.update({
             'class': base,
             'placeholder': 'Введите логин',
         })
+
         self.fields['password'].widget.attrs.update({
             'class': base,
             'placeholder': 'Введите пароль',

@@ -42,26 +42,33 @@ def cart_detail(request):
 
 def order_create(request):
     cart = Cart(request)
+    
     if len(cart) == 0:
         messages.warning(request, "Корзина пуста")
+
         return redirect('catalog:list')
 
     user = request.user
     if user.is_authenticated and user.company and user.company.status != 'active':
         messages.warning(request, "Заказы доступны после одобрения компании")
+
         return redirect('dashboard:home')
 
     if request.method == 'POST':
         form = OrderForm(request.POST)
+
         if form.is_valid():
             with transaction.atomic():
                 order = form.save(commit=False)
+
                 if user.is_authenticated:
                     order.user = user
                     order.company = user.company
+
                     if user.company:
                         order.company_name = user.company.name
                         order.company_inn = user.company.inn
+
                 order.total = cart.get_total()
                 order.save()
 
@@ -80,11 +87,13 @@ def order_create(request):
             return redirect('orders:order_success', pk=order.pk)
     else:
         initial = {}
+
         if user.is_authenticated:
             initial = {
                 'name': user.get_full_name() or user.username,
                 'email': user.email,
             }
+
             if user.company:
                 initial['company_name'] = user.company.name
                 initial['company_inn'] = user.company.inn
@@ -94,17 +103,17 @@ def order_create(request):
 
 
 def order_success(request, pk):
-    """Страница успешного оформления заказа"""
     order = get_object_or_404(Order, pk=pk)
+
     return render(request, 'orders/order_success.html', {'order': order})
 
 
 def _send_order_email(order):
-    """Отправка уведомления менеджеру о новом заказе"""
     items = "\n".join(
         f"  - {i.product_name} × {i.quantity} = {i.subtotal} ₽"
         for i in order.items.all()
     )
+
     text = (
         f"Новый заказ №{order.id}\n\n"
         f"Клиент: {order.name}\n"
@@ -117,6 +126,7 @@ def _send_order_email(order):
         f"ИТОГО: {order.total} ₽\n\n"
         f"Комментарий: {order.comment}"
     )
+
     try:
         send_mail(
             subject=f"Заказ №{order.id} с сайта",
@@ -125,5 +135,6 @@ def _send_order_email(order):
             recipient_list=[settings.MANAGER_EMAIL],
             fail_silently=True,
         )
+
     except Exception:
         pass

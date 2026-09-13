@@ -11,7 +11,6 @@ class Review(models.Model):
         ('rejected', 'Отклонён'),
     ]
 
-    # Автор
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
         null=True, blank=True, related_name='reviews'
@@ -20,7 +19,6 @@ class Review(models.Model):
     email = models.EmailField(verbose_name="Email")
     company = models.CharField(max_length=150, blank=True, verbose_name="Компания")
 
-    # Контент
     rating = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name="Оценка"
@@ -28,19 +26,16 @@ class Review(models.Model):
     title = models.CharField(max_length=150, blank=True, verbose_name="Заголовок")
     text = models.TextField(verbose_name="Текст отзыва")
 
-    # Что оцениваем
     product = models.ForeignKey(
         'catalog.Product', on_delete=models.CASCADE,
         null=True, blank=True, related_name='reviews',
         verbose_name="Товар"
     )
 
-    # Модерация
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     is_verified = models.BooleanField(default=False, verbose_name="Подтверждённый заказ")
     admin_comment = models.TextField(blank=True, verbose_name="Комментарий модератора")
 
-    # Метаданные
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)

@@ -11,7 +11,6 @@ class ReviewForm(forms.ModelForm):
         label="Оценка",
     )
 
-    # Honeypot — скрытое поле от ботов
     website = forms.CharField(
         required=False,
         widget=forms.HiddenInput(),
@@ -40,6 +39,7 @@ class ReviewForm(forms.ModelForm):
             'hover:border-gray-500 '
             'focus:outline-none focus:ring-0 focus:bg-white focus:border-brand-500'
         )
+
         for name, field in self.fields.items():
             if isinstance(field.widget, (forms.RadioSelect, forms.HiddenInput)):
                 continue
@@ -49,7 +49,6 @@ class ReviewForm(forms.ModelForm):
                 field.widget.attrs['class'] = base
 
     def clean_website(self):
-        """Honeypot: если заполнено — бот."""
         if self.cleaned_data.get('website'):
             raise forms.ValidationError("Bot detected")
         return ''

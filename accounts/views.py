@@ -16,6 +16,7 @@ def register(request):
 
     if request.method == 'POST':
         form = CompanyRegistrationForm(request.POST)
+
         if form.is_valid():
             with transaction.atomic():
                 company = Company.objects.create(
@@ -47,7 +48,9 @@ def register(request):
 
             login(request, user)
             messages.success(request, "Регистрация принята! Компания на модерации.")
+            
             return redirect('dashboard:home')
+        
     else:
         form = CompanyRegistrationForm()
 
@@ -58,10 +61,14 @@ def register(request):
 def profile(request):
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=request.user)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Профиль обновлён")
+
             return redirect('accounts:profile')
+        
     else:
         form = ProfileForm(instance=request.user)
+
     return render(request, 'accounts/profile.html', {'form': form})

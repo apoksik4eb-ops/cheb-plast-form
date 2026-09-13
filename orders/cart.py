@@ -6,18 +6,21 @@ class Cart:
     def __init__(self, request):
         self.session = request.session
         cart = self.session.get('cart')
+
         if not cart:
             cart = self.session['cart'] = {}
         self.cart = cart
 
     def add(self, product, quantity=1, update=False, user=None):
         pid = str(product.id)
+
         if pid not in self.cart:
             price = product.get_price_for(user) if user else product.price
             self.cart[pid] = {
                 'quantity': 0,
                 'price': str(price)
             }
+
         if update:
             self.cart[pid]['quantity'] = int(quantity)
         else:
@@ -26,6 +29,7 @@ class Cart:
 
     def remove(self, product):
         pid = str(product.id)
+        
         if pid in self.cart:
             del self.cart[pid]
             self.save()

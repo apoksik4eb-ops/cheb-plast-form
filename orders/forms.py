@@ -5,8 +5,7 @@ from .models import Order
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['name', 'company_name', 'company_inn', 'email', 'phone',
-                  'address', 'payment', 'comment']
+        fields = ['name', 'company_name', 'company_inn', 'email', 'phone', 'address', 'payment', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500'}),
             'company_name': forms.TextInput(attrs={'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500'}),
@@ -20,6 +19,8 @@ class OrderForm(forms.ModelForm):
 
     def clean_company_inn(self):
         inn = self.cleaned_data.get('company_inn', '')
+
         if inn and (not inn.isdigit() or len(inn) not in (10, 12)):
             raise forms.ValidationError("ИНН должен содержать 10 или 12 цифр")
+        
         return inn
