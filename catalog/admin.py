@@ -17,8 +17,7 @@ class ProductImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('preview', 'name', 'article', 'category', 'price',
-                    'stock', 'is_active', 'manager')
+    list_display = ('preview', 'name', 'article', 'category', 'price', 'stock', 'is_active', 'manager')
     list_display_links = ('preview', 'name')
     list_filter = ('category', 'is_active', 'is_available', 'is_new', 'is_hit', 'manager')
     search_fields = ('name', 'article', 'description')
@@ -31,8 +30,7 @@ class ProductAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Основное', {'fields': ('name', 'slug', 'article', 'category')}),
         ('Описание', {'fields': ('short_description', 'description', 'specs')}),
-        ('Цена и склад', {'fields': ('price', 'price_wholesale', 'unit',
-                                     'min_order', 'stock', 'is_available')}),
+        ('Цена и склад', {'fields': ('price', 'price_wholesale', 'unit', 'min_order', 'stock', 'is_available')}),
         ('Медиа', {'fields': ('image',)}),
         ('Публикация', {'fields': ('is_active', 'is_new', 'is_hit')}),
         ('Ответственный', {'fields': ('manager',)}),
@@ -42,21 +40,26 @@ class ProductAdmin(admin.ModelAdmin):
     def preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="height:40px;border-radius:4px;">', obj.image.url)
+        
         return '—'
+    
     preview.short_description = 'Фото'
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
+        
         return qs.filter(manager=request.user)
 
     def save_model(self, request, obj, form, change):
         if not change and not obj.manager:
             obj.manager = request.user
+            
         super().save_model(request, obj, form, change)
 
     def has_change_permission(self, request, obj=None):
         if obj and not request.user.is_superuser:
             return obj.manager == request.user
+        
         return super().has_change_permission(request, obj)

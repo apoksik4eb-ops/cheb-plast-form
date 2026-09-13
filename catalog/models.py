@@ -77,10 +77,12 @@ class Product(models.Model):
             base = slugify(self.name)[:50] or 'product'
             slug = base
             i = 1
+
             while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 i += 1
                 slug = f"{base}-{i}"
             self.slug = slug
+
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -94,8 +96,10 @@ class Product(models.Model):
 
         if user.company:
             c = user.company
+
             if c.price_type == 'wholesale' and self.price_wholesale:
                 base = self.price_wholesale
+
             if c.discount:
                 base = base * (100 - c.discount) / 100
 
@@ -103,9 +107,8 @@ class Product(models.Model):
 
     def update_rating(self):
         from django.db.models import Avg, Count
-        agg = self.reviews.filter(status='approved').aggregate(
-            avg=Avg('rating'), count=Count('id')
-        )
+        agg = self.reviews.filter(status='approved').aggregate(avg=Avg('rating'), count=Count('id'))
+        
         self.rating_avg = agg['avg'] or 0
         self.rating_count = agg['count'] or 0
         self.save(update_fields=['rating_avg', 'rating_count'])

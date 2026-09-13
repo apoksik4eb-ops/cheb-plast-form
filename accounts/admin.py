@@ -24,14 +24,17 @@ class CompanyAdmin(admin.ModelAdmin):
 
     def status_badge(self, obj):
         colors = {'pending': '#f0ad4e', 'active': '#5cb85c', 'blocked': '#d9534f'}
+
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:3px">{}</span>',
             colors.get(obj.status, '#999'), obj.get_status_display()
         )
+    
     status_badge.short_description = 'Статус'
 
     def users_count(self, obj):
         return obj.users.count()
+    
     users_count.short_description = 'Сотрудников'
 
     @admin.action(description="Одобрить компании")
@@ -40,6 +43,7 @@ class CompanyAdmin(admin.ModelAdmin):
             company.status = 'active'
             company.approved_at = timezone.now()
             company.save()
+
             for user in company.users.all():
                 send_mail(
                     subject="Регистрация одобрена",
@@ -48,6 +52,7 @@ class CompanyAdmin(admin.ModelAdmin):
                     recipient_list=[user.email],
                     fail_silently=True,
                 )
+                
         self.message_user(request, f"Одобрено: {queryset.count()}")
 
     @admin.action(description="Заблокировать компании")

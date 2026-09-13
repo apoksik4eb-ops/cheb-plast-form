@@ -15,21 +15,45 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
 
     <div>
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden aspect-square">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden aspect-square mb-4">
             {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                <img id="main-image"
+                     src="{{ product.image.url }}"
+                     alt="{{ product.name }}"
+                     class="w-full h-full object-cover transition duration-300">
             {% else %}
-                <div class="w-full h-full flex items-center justify-center text-gray-400">Нет фото</div>
+                <div class="w-full h-full flex items-center justify-center text-gray-400">
+                    Нет фото
+                </div>
             {% endif %}
         </div>
-        {% if gallery %}
-            <div class="grid grid-cols-4 gap-2 mt-3">
+
+        {# Миниатюры #}
+        <div class="grid grid-cols-4 gap-2">
+            {% if gallery %}
+                {# Если есть галерея — показываем только её, без дубля главного фото #}
                 {% for img in gallery %}
-                    <img src="{{ img.image.url }}" alt="{{ img.alt_text }}"
-                         class="aspect-square object-cover rounded-lg border border-gray-200 cursor-pointer hover:border-brand-500">
+                    <button type="button"
+                            class="thumb-btn aspect-square object-cover rounded-lg border-2 {% if forloop.first %}border-brand-500{% else %}border-gray-200{% endif %} cursor-pointer overflow-hidden hover:border-brand-500 transition"
+                            data-src="{{ img.image.url }}">
+                        <img src="{{ img.image.url }}"
+                             alt="{{ img.alt_text|default:product.name }}"
+                             class="w-full h-full object-cover">
+                    </button>
                 {% endfor %}
-            </div>
-        {% endif %}
+            {% else %}
+                {# Если галереи нет, но есть главное фото — показываем его как единственную миниатюру #}
+                {% if product.image %}
+                    <button type="button"
+                            class="thumb-btn aspect-square object-cover rounded-lg border-2 border-brand-500 cursor-pointer overflow-hidden transition"
+                            data-src="{{ product.image.url }}">
+                        <img src="{{ product.image.url }}"
+                             alt="{{ product.name }}"
+                             class="w-full h-full object-cover">
+                    </button>
+                {% endif %}
+            {% endif %}
+        </div>
     </div>
 
     <div>
@@ -127,4 +151,37 @@
 </section>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mainImage = document.getElementById('main-image');
+    const thumbs = document.querySelectorAll('.thumb-btn');
+
+    if (!mainImage || thumbs.length === 0) return;
+
+    thumbs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            // 1. Меняем главное фото
+            const newSrc = this.dataset.src;
+            if (newSrc) {
+                mainImage.src = newSrc;
+
+                // Плавное появление
+                mainImage.style.opacity = '0';
+                setTimeout(() => { mainImage.style.opacity = '1'; }, 50);
+            }
+
+            // 2. Переключаем подсветку
+            thumbs.forEach(t => {
+                t.classList.remove('border-brand-500');
+                t.classList.add('border-gray-200');
+            });
+            this.classList.remove('border-gray-200');
+            this.classList.add('border-brand-500');
+        });
+    });
+});
+</script>
 {% endblock %}

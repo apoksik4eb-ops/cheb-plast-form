@@ -32,8 +32,10 @@ class ReviewAdmin(admin.ModelAdmin):
         for review in queryset:
             review.status = 'approved'
             review.save()
+
             if review.product:
                 review.product.update_rating()
+                
         self.message_user(request, f"Одобрено: {queryset.count()}")
 
     @admin.action(description="Отклонить выбранные отзывы")

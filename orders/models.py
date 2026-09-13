@@ -12,17 +12,29 @@ class Order(models.Model):
         ('done', 'Выполнен'),
         ('canceled', 'Отменён'),
     ]
+
     PAYMENT_CHOICES = [
         ('cash', 'Наличными'),
         ('card', 'Картой'),
         ('invoice', 'По счёту (для юрлиц)'),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
-                             null=True, related_name='orders', verbose_name="Автор")
-    company = models.ForeignKey('accounts.Company', on_delete=models.SET_NULL,
-                                null=True, blank=True, related_name='orders',
-                                verbose_name="Компания")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='orders',
+        verbose_name="Автор"
+    )
+
+    company = models.ForeignKey(
+        'accounts.Company',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='orders',
+        verbose_name="Компания"
+    )
 
     name = models.CharField(max_length=200, verbose_name="Контактное лицо")
     company_name = models.CharField(max_length=255, blank=True)

@@ -13,6 +13,7 @@ class OrderItemInline(admin.TabularInline):
         if obj.pk:
             return f"{obj.subtotal} ₽"
         return '—'
+    
     subtotal_display.short_description = 'Сумма'
 
 
@@ -33,22 +34,21 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('user', 'company', 'name', 'company_name',
                        'company_inn', 'email', 'phone', 'address')
         }),
+
         ('Заказ', {
             'fields': ('payment', 'comment', 'status', 'total')
         }),
+
         ('Метаданные', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
 
-
-@admin.register(OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('order', 'product_name', 'price', 'quantity', 'subtotal_display')
-    search_fields = ('product_name', 'order__id')
-    list_filter = ('order__status',)
-
-    def subtotal_display(self, obj):
-        return f"{obj.subtotal} ₽"
-    subtotal_display.short_description = 'Сумма'
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        order = form.instance
+        new_total = sum(item.subtotal for item in order.items.all())
+        if order.total != new_total:
+            order.total = new_total
+            order.save(update_fields=['total'])
