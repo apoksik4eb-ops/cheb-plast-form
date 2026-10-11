@@ -49,6 +49,7 @@ def order_create(request):
         return redirect('catalog:list')
 
     user = request.user
+
     if user.is_authenticated and user.company and user.company.status != 'active':
         messages.warning(request, "Заказы доступны после одобрения компании")
 
@@ -67,7 +68,6 @@ def order_create(request):
 
                     if user.company:
                         order.company_name = user.company.name
-                        order.company_inn = user.company.inn
 
                 order.total = cart.get_total()
                 order.save()
@@ -85,6 +85,7 @@ def order_create(request):
             _send_order_email(order)
 
             return redirect('orders:order_success', pk=order.pk)
+        
     else:
         initial = {}
 
@@ -92,11 +93,13 @@ def order_create(request):
             initial = {
                 'name': user.get_full_name() or user.username,
                 'email': user.email,
+                'phone': user.phone or ''
             }
 
             if user.company:
                 initial['company_name'] = user.company.name
-                initial['company_inn'] = user.company.inn
+                initial['address'] = (user.company.actual_address or user.company.legal_address or '')
+
         form = OrderForm(initial=initial)
 
     return render(request, 'orders/order_create.html', {'cart': cart, 'form': form})
@@ -118,7 +121,6 @@ def _send_order_email(order):
         f"Новый заказ №{order.id}\n\n"
         f"Клиент: {order.name}\n"
         f"Компания: {order.company_name or 'физлицо'}\n"
-        f"ИНН: {order.company_inn or '—'}\n"
         f"Телефон: {order.phone}\n"
         f"Email: {order.email}\n"
         f"Оплата: {order.get_payment_display()}\n\n"

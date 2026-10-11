@@ -5,9 +5,6 @@ from .models import User, Company
 
 class CompanyRegistrationForm(UserCreationForm):
     company_name = forms.CharField(max_length=255, label="Название компании")
-    inn = forms.CharField(max_length=12, label="ИНН")
-    kpp = forms.CharField(max_length=9, required=False, label="КПП")
-    ogrn = forms.CharField(max_length=15, required=False, label="ОГРН")
     legal_address = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 2}),
         label="Юридический адрес"
@@ -26,8 +23,7 @@ class CompanyRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2',
-                  'first_name', 'last_name')
+        fields = ('username', 'email', 'password1', 'password2', 'first_name', 'last_name')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,17 +43,6 @@ class CompanyRegistrationForm(UserCreationForm):
                 field.widget.attrs.setdefault('placeholder', field.label or name)
 
         self.fields['company_name'].widget.attrs['autofocus'] = True
-
-    def clean_inn(self):
-        inn = self.cleaned_data['inn']
-
-        if not inn.isdigit() or len(inn) not in (10, 12):
-            raise forms.ValidationError("ИНН: 10 или 12 цифр")
-        
-        if Company.objects.filter(inn=inn).exists():
-            raise forms.ValidationError("Компания с таким ИНН уже зарегистрирована")
-        
-        return inn
 
     def clean_email(self):
         email = self.cleaned_data['email']

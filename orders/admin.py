@@ -7,7 +7,9 @@ class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
     fields = ('product_name', 'price', 'quantity', 'subtotal_display')
-    readonly_fields = ('product_name', 'price', 'quantity', 'subtotal_display')
+    readonly_fields = ('product_name', 'subtotal_display')
+    verbose_name = "Позиция заказа"
+    verbose_name_plural = "Позиции заказа"
 
     def subtotal_display(self, obj):
         if obj.pk:
@@ -22,7 +24,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'company_name', 'phone', 'total', 'status', 'created_at')
     list_display_links = ('id', 'name')
     list_filter = ('status', 'payment', 'created_at')
-    search_fields = ('name', 'phone', 'email', 'company_name', 'company_inn')
+    search_fields = ('name', 'phone', 'email', 'company_name')
     list_editable = ('status',)
     readonly_fields = ('total', 'created_at', 'updated_at', 'user', 'company')
     inlines = [OrderItemInline]
@@ -32,7 +34,7 @@ class OrderAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Клиент', {
             'fields': ('user', 'company', 'name', 'company_name',
-                       'company_inn', 'email', 'phone', 'address')
+                       'email', 'phone', 'address')
         }),
 
         ('Заказ', {

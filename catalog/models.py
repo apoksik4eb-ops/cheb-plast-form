@@ -6,10 +6,10 @@ from django.conf import settings
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=150)
-    slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField(blank=True)
-    order = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=150, verbose_name="Название")
+    slug = models.SlugField(unique=True, blank=True, verbose_name="URL-идентификатор")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
         ordering = ['order', 'name']
@@ -29,40 +29,41 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
-    article = models.CharField(max_length=50, unique=True)
-    short_description = models.CharField(max_length=300, blank=True)
-    description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name="Категория")
+    name = models.CharField(max_length=200, verbose_name="Название")
+    slug = models.SlugField(unique=True, blank=True, verbose_name="URL-идентификатор")
+    article = models.CharField(max_length=50, unique=True, verbose_name="Артикул")
+    short_description = models.CharField(max_length=300, blank=True, verbose_name="Краткое описание")
+    description = models.TextField(verbose_name="Полное описание")
 
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    price_wholesale = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    unit = models.CharField(max_length=20, default='шт')
-    min_order = models.PositiveIntegerField(default=1)
-    stock = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Розничная цена")
+    price_wholesale = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Оптовая цена")
+    unit = models.CharField(max_length=20, default='шт', verbose_name="Единица измерения")
+    min_order = models.PositiveIntegerField(default=1, verbose_name="Мин. заказ")
+    stock = models.PositiveIntegerField(default=0, verbose_name="Остаток на складе")
 
-    image = models.ImageField(upload_to='products/', blank=True, null=True)
-    specs = models.JSONField(default=dict, blank=True)
+    image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="Главное фото")
+    specs = models.JSONField(default=dict, blank=True, verbose_name="Характеристики (JSON)")
 
-    is_active = models.BooleanField(default=True)
-    is_available = models.BooleanField(default=True)
-    is_new = models.BooleanField(default=False)
-    is_hit = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+    is_available = models.BooleanField(default=True, verbose_name="В наличии")
+    is_new = models.BooleanField(default=False, verbose_name="Новинка")
+    is_hit = models.BooleanField(default=False, verbose_name="Хит продаж")
 
     manager = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='managed_products'
+        null=True, blank=True, related_name='managed_products',
+        verbose_name="Ответственный менеджер"
     )
 
-    rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=0)
-    rating_count = models.PositiveIntegerField(default=0)
+    rating_avg = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name="Средний рейтинг")
+    rating_count = models.PositiveIntegerField(default=0, verbose_name="Кол-во отзывов")
 
-    meta_title = models.CharField(max_length=200, blank=True)
-    meta_description = models.CharField(max_length=300, blank=True)
+    meta_title = models.CharField(max_length=200, blank=True, verbose_name="SEO Title")
+    meta_description = models.CharField(max_length=300, blank=True, verbose_name="SEO Description")
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлён")
 
     class Meta:
         ordering = ['-created_at']
@@ -115,9 +116,13 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
-    image = models.ImageField(upload_to='products/gallery/')
-    alt_text = models.CharField(max_length=200, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery', verbose_name="Товар")
+    image = models.ImageField(upload_to='products/gallery/', verbose_name="Изображение")
+    alt_text = models.CharField(max_length=200, blank=True, verbose_name="Подпись (alt)", help_text="Текст для SEO и доступности")
 
+    class Meta:
+        verbose_name = "Фотография товара"
+        verbose_name_plural = "Фотографии товаров"
+        
     def __str__(self):
         return f"Фото для {self.product.name}"
