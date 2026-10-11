@@ -19,47 +19,37 @@
             </div>
         {% endif %}
 
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <legend class="text-lg font-bold mb-4 px-2">Данные компании</legend>
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-bold mb-4">Данные компании</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                 <div class="md:col-span-2">
-                    <label for="{{ form.company_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Название компании</label>
+                    <label for="{{ form.company_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ form.company_name.label }}
+                    </label>
                     {{ form.company_name }}
                     {% if form.company_name.errors %}<div class="text-sm text-red-500 mt-1">{{ form.company_name.errors.0 }}</div>{% endif %}
                 </div>
 
-                <div>
-                    <label for="{{ form.inn.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">ИНН</label>
-                    {{ form.inn }}
-                    {% if form.inn.errors %}<div class="text-sm text-red-500 mt-1">{{ form.inn.errors.0 }}</div>{% endif %}
-                </div>
-
-                <div>
-                    <label for="{{ form.kpp.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">КПП</label>
-                    {{ form.kpp }}
-                </div>
-
-                <div>
-                    <label for="{{ form.ogrn.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">ОГРН</label>
-                    {{ form.ogrn }}
-                </div>
-
                 <div class="md:col-span-2">
-                    <label for="{{ form.legal_address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Юридический адрес</label>
+                    <label for="{{ form.legal_address.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ form.legal_address.label }}
+                    </label>
                     {{ form.legal_address }}
                 </div>
 
                 <div>
-                    <label for="{{ form.company_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Телефон компании</label>
+                    <label for="{{ form.company_phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ form.company_phone.label }}
+                    </label>
                     {{ form.company_phone }}
                 </div>
 
                 <div>
-                    <label for="{{ form.company_email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Email компании</label>
+                    <label for="{{ form.company_email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ form.company_email.label }}
+                    </label>
                     {{ form.company_email }}
                 </div>
-
             </div>
         </div>
 

@@ -21,9 +21,6 @@ def register(request):
             with transaction.atomic():
                 company = Company.objects.create(
                     name=form.cleaned_data['company_name'],
-                    inn=form.cleaned_data['inn'],
-                    kpp=form.cleaned_data.get('kpp', ''),
-                    ogrn=form.cleaned_data.get('ogrn', ''),
                     legal_address=form.cleaned_data['legal_address'],
                     phone=form.cleaned_data['company_phone'],
                     email=form.cleaned_data['company_email'],
@@ -39,8 +36,10 @@ def register(request):
 
             send_mail(
                 subject=f"Новая регистрация компании: {company.name}",
-                message=f"Компания: {company.name}\nИНН: {company.inn}\n"
-                        f"Контакт: {user.get_full_name()} / {user.phone} / {user.email}",
+                message=(
+                    f"Компания: {company.name}\n"
+                    f"Контакт: {user.get_full_name()} / {user.phone} / {user.email}"
+                ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[settings.MANAGER_EMAIL],
                 fail_silently=True,

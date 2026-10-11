@@ -18,10 +18,6 @@ class Company(models.Model):
 
     name = models.CharField(max_length=255, verbose_name="Название компании")
     slug = models.SlugField(unique=True, blank=True)
-    inn = models.CharField(max_length=12, unique=True, verbose_name="ИНН")
-    kpp = models.CharField(max_length=9, blank=True, verbose_name="КПП")
-    ogrn = models.CharField(max_length=15, blank=True, verbose_name="ОГРН")
-
     legal_address = models.TextField(blank=True, verbose_name="Юр. адрес")
     actual_address = models.TextField(blank=True, verbose_name="Факт. адрес")
     phone = models.CharField(max_length=20, blank=True)

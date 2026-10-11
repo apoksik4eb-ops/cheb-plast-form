@@ -8,15 +8,15 @@ from .models import Company, User
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'inn', 'status_badge', 'price_type', 'users_count', 'created_at')
+    list_display = ('name', 'status_badge', 'price_type', 'users_count', 'created_at')
     list_filter = ('status', 'price_type', 'created_at')
-    search_fields = ('name', 'inn', 'email', 'phone')
+    search_fields = ('name', 'email', 'phone')
     list_editable = ('price_type',)
     actions = ['approve_companies', 'block_companies']
     readonly_fields = ('created_at', 'approved_at', 'slug')
 
     fieldsets = (
-        ('Реквизиты', {'fields': ('name', 'slug', 'inn', 'kpp', 'ogrn')}),
+        ('Реквизиты', {'fields': ('name', 'slug')}),
         ('Контакты', {'fields': ('legal_address', 'actual_address', 'phone', 'email', 'website')}),
         ('Управление', {'fields': ('manager_contact', 'status', 'price_type', 'discount')}),
         ('Метаданные', {'fields': ('created_at', 'approved_at', 'notes')}),
