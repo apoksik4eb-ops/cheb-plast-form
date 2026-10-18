@@ -40,11 +40,21 @@
                    class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
             <select name="sort"
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
-                <option value="">Сортировка</option>
-                <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Цена ↑</option>
-                <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Цена ↓</option>
-                <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Новинки</option>
+                        <option value="" {% if not request.GET.sort %}selected{% endif %}>По алфавиту (А→Я)</option>
+
+                        <option value="name_desc" {% if request.GET.sort == 'name_desc' %}selected{% endif %}>По алфавиту (Я→А)</option>
+       
+                        <option value="article_asc" {% if request.GET.sort == 'article_asc' %}selected{% endif %}>По артикулу (А→Я)</option>
+
+                        <option value="article_desc" {% if request.GET.sort == 'article_desc' %}selected{% endif %}>По артикулу (Я→А)</option>
+
+                        <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Цена ↑</option>
+
+                        <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Цена ↓</option>
+
+                        <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Новинки</option>
             </select>
+
             <button type="submit"
                     class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                 Применить
@@ -58,7 +68,49 @@
                 {% endfor %}
             </div>
 
-            {% include 'includes/pagination.html' with page=page %}
+            {% if page_obj.has_other_pages %}
+            <div class="flex justify-center mt-12 mb-8">
+                <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                           class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            &larr; Назад
+                        </a>
+                    {% else %}
+                        <span class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                            &larr; Назад
+                        </span>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-brand-600 bg-brand-600 text-sm font-bold text-white z-10">
+                                {{ num }}
+                            </span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            
+                            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+ 
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" 
+                           class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Вперед &rarr;
+                        </a>
+                    {% else %}
+                        <span class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                            Вперед &rarr;
+                        </span>
+                    {% endif %}
+                    
+                </nav>
+            </div>
+            {% endif %}
         {% else %}
             <p class="text-center text-gray-500 py-16">Ничего не найдено</p>
         {% endif %}
