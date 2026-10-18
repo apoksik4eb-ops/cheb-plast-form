@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Category, Product, ProductImage
+from accounts.models import User
 
 
 @admin.register(Category)
@@ -51,6 +52,12 @@ class ProductAdmin(admin.ModelAdmin):
         ('Ответственный', {'fields': ('manager',)}),
         ('SEO', {'fields': ('meta_title', 'meta_description'), 'classes': ('collapse',)}),
     )
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "manager":
+            kwargs["queryset"] = User.objects.filter(is_staff=True)
+            
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def preview(self, obj):
         if obj.image:

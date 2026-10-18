@@ -39,6 +39,12 @@ class ProductListView(ListView):
             qs = qs.order_by('-price')
         elif sort == 'new':
             qs = qs.order_by('-created_at')
+        elif sort == 'name_desc':
+            qs = qs.order_by('-name')
+        elif sort == 'article_asc':
+            qs = qs.order_by('article')
+        elif sort == 'article_desc':
+            qs = qs.order_by('-article')
         else:
             qs = qs.order_by('name')
 
